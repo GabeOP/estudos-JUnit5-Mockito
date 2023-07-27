@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,6 +38,14 @@ public class Produto {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Status status;
+
+  @ManyToMany
+  @JoinTable(
+          name="tb_produto_categoria",
+          joinColumns = @JoinColumn(name = "produto_id"),
+          inverseJoinColumns = @JoinColumn(name = "categoria_id")
+  )
+  private Set<Categoria> categorias = new HashSet<>();
 
   private static String formatarData(LocalDateTime data) {
     // Define o padrão de formatação desejado
