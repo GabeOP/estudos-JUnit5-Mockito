@@ -34,8 +34,9 @@ public class ProdutoService {
     return mapper.map(entity, ProdutoDTO.class);
   }
 
-  public Produto adicionar(Produto produto) {
+  public ProdutoDTO adicionar(ProdutoDTO dto) {
+    Produto produto = mapper.map(dto, Produto.class);
     repository.save(produto);
-    return produto;
+    return dto;
   }
 }

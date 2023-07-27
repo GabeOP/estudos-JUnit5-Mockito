@@ -1,7 +1,6 @@
 package com.gabriel.estudosolojunit.controller;
 
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
-import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -35,8 +34,8 @@ public class ProdutoController {
   }
 
   @PostMapping
-  public ResponseEntity<Produto> adicionar(@Valid @RequestBody Produto produto) {
+  public ResponseEntity<String> adicionar(@Valid @RequestBody ProdutoDTO produto) {
     service.adicionar(produto);
-    return ResponseEntity.status(HttpStatus.CREATED).body(produto);
+    return ResponseEntity.status(HttpStatus.CREATED).body("Produto cadastrado com sucesso!");
   }
 }
