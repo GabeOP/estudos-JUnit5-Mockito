@@ -4,10 +4,9 @@ import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/produto")
@@ -17,8 +16,8 @@ public class ProdutoController {
   ProdutoService service;
 
   @PostMapping
-  public Produto adicionar(@Valid @RequestBody Produto produto) {
-    service.criar(produto);
-    return produto;
+  public ResponseEntity<Produto> adicionar(@Valid @RequestBody Produto produto) {
+    service.adicionar(produto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(produto);
   }
 }
