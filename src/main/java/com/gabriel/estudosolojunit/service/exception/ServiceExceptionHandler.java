@@ -3,6 +3,7 @@ package com.gabriel.estudosolojunit.service.exception;
 import com.gabriel.estudosolojunit.model.StandardError;
 import com.gabriel.estudosolojunit.model.exceptions.ProdutoNaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,5 +21,14 @@ public class ServiceExceptionHandler {
             ex.getMessage(),
             request.getRequestURI());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<StandardError> campoVazio(ConstraintViolationException ex, HttpServletRequest request) {
+    StandardError error = new StandardError(LocalDateTime.now(),
+            HttpStatus.UNPROCESSABLE_ENTITY.value(),
+            ex.getMessage(),
+            request.getRequestURI());
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
   }
 }
