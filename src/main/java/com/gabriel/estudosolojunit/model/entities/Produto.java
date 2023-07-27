@@ -2,6 +2,7 @@ package com.gabriel.estudosolojunit.model.entities;
 
 import com.gabriel.estudosolojunit.model.enums.Status;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,13 +23,16 @@ public class Produto {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
+  @Column
+  @NotNull(message = "o campo 'nome' não pode ser vazio")
   private String nome;
 
-  @Column(nullable = false)
+  @Column
+  @NotNull(message = "o campo 'descricao' não pode ser vazio")
   private String descricao;
 
-  @Column(nullable = false)
+  @Column
+  @NotNull(message = "o campo 'valor' não pode ser vazio")
   @PositiveOrZero
   private Double valor;
 
@@ -36,7 +40,8 @@ public class Produto {
   private String data_modificacao = formatarData(LocalDateTime.now());
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column
+  @NotNull(message = "o campo 'status' não pode ser vazio")
   private Status status;
 
   @ManyToMany
