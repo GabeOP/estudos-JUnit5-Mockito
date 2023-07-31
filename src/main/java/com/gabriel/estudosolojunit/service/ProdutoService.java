@@ -55,4 +55,12 @@ public class ProdutoService {
     repository.save(produto);
     return mapper.map(produto, ProdutoDTO.class);
   }
+
+  public void excluir(Long id) {
+    repository.findById(id).orElseThrow(() -> {
+      throw new ProdutoNaoEncontradoException("Produto não encontrado");
+    });
+
+    repository.deleteById(id);
+  }
 }
