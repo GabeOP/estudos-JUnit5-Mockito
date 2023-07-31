@@ -39,4 +39,20 @@ public class ProdutoService {
     repository.save(produto);
     return dto;
   }
+
+  public ProdutoDTO editar(Long id, ProdutoDTO dto) {
+
+    Produto produto = repository.findById(id).orElseThrow(() -> {
+      throw new ProdutoNaoEncontradoException("Produto não encontrado");
+    });
+
+    produto.setNome(dto.getNome());
+    produto.setDescricao(dto.getDescricao());
+    produto.setValor(dto.getValor());
+    produto.setStatus(dto.getStatus());
+    produto.setData_modificacao(dto.getData_modificacao());
+
+    repository.save(produto);
+    return mapper.map(produto, ProdutoDTO.class);
+  }
 }

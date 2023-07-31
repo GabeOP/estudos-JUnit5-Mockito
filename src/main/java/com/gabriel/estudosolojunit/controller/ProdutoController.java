@@ -34,8 +34,14 @@ public class ProdutoController {
   }
 
   @PostMapping
-  public ResponseEntity<String> adicionar(@Valid @RequestBody ProdutoDTO produto) {
-    service.adicionar(produto);
-    return ResponseEntity.status(HttpStatus.CREATED).body("Produto cadastrado com sucesso!");
+  public ResponseEntity<ProdutoDTO> adicionar(@Valid @RequestBody ProdutoDTO produto) {
+    ProdutoDTO dto = service.adicionar(produto);
+    return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<ProdutoDTO> editar(@Valid @PathVariable Long id, @RequestBody ProdutoDTO produto) {
+    ProdutoDTO dto = service.editar(id, produto);
+    return ResponseEntity.status(HttpStatus.OK).body(dto);
   }
 }
