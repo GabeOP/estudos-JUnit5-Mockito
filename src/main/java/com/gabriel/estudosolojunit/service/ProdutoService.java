@@ -2,6 +2,7 @@ package com.gabriel.estudosolojunit.service;
 
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
+import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
 import com.gabriel.estudosolojunit.model.exceptions.ProdutoNaoEncontradoException;
 import com.gabriel.estudosolojunit.repository.ProdutoRepository;
 import org.modelmapper.ModelMapper;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,10 +37,16 @@ public class ProdutoService {
   }
 
   public ProdutoDTO adicionar(ProdutoDTO dto) {
+    Optional<Produto> optional = repository.findByNome(dto.getNome());
+    if(optional.isPresent()) {
+      throw new ProdutoJaCadastradoException("Produto já cadastrado");
+    }
+
     Produto produto = mapper.map(dto, Produto.class);
     repository.save(produto);
     return dto;
   }
+
 
   public ProdutoDTO editar(Long id, ProdutoDTO dto) {
 
@@ -54,6 +62,7 @@ public class ProdutoService {
 
     repository.save(produto);
     return mapper.map(produto, ProdutoDTO.class);
+
   }
 
   public void excluir(Long id) {
