@@ -37,6 +37,13 @@ public class ProdutoDTO {
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String data_modificacao = formatarData(LocalDateTime.now());
 
+  public ProdutoDTO(String nome, String descricao, Double valor, Status status) {
+    this.nome = nome;
+    this.descricao = descricao;
+    this.valor = valor;
+    this.status = status;
+  }
+
   private static String formatarData(LocalDateTime data) {
     // Define o padrão de formatação desejado
     String padrao = "dd/MM/yyyy HH:mm:ss";

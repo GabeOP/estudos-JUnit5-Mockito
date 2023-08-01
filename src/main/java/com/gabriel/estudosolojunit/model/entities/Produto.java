@@ -45,6 +45,12 @@ public class Produto {
   )
   private Set<Categoria> categorias = new HashSet<>();
 
+  public Produto(String nome, String descricao, Double valor, Status status) {
+    this.nome = nome;
+    this.descricao = descricao;
+    this.valor = valor;
+    this.status = status;
+  }
 
   private static String formatarData(LocalDateTime data) {
     // Define o padrão de formatação desejado
