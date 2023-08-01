@@ -3,6 +3,7 @@ package com.gabriel.estudosolojunit.service;
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
+import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
 import com.gabriel.estudosolojunit.repository.ProdutoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -65,6 +65,18 @@ class ProdutoServiceTest {
     assertEquals(response.getStatus(), STATUS);
   }
 
+  @Test
+  void whenAdicionarThenThrowProdutoJaCadastradoException() {
+    when(repository.save(any())).thenThrow(new ProdutoJaCadastradoException("Produto já cadastrado"));
+
+    try{
+      service.adicionar(produtoDTO);
+    }catch(Exception ex) {
+      assertEquals(ProdutoJaCadastradoException.class, ex.getClass());
+      assertEquals("Produto já cadastrado", ex.getMessage());
+    }
+
+  }
   @Test
   void editar() {
   }
