@@ -45,7 +45,8 @@ public class Produto {
   )
   private Set<Categoria> categorias = new HashSet<>();
 
-  public Produto(String nome, String descricao, Double valor, Status status) {
+  public Produto(Long id, String nome, String descricao, Double valor, Status status) {
+    this.id = id;
     this.nome = nome;
     this.descricao = descricao;
     this.valor = valor;

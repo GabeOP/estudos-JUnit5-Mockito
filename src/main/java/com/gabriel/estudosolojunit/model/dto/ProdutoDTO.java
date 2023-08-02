@@ -20,6 +20,10 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProdutoDTO {
+
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+  private Long id;
+
   @NotBlank(message = "Deve ser preenchido")
   private String nome;
 
@@ -37,7 +41,8 @@ public class ProdutoDTO {
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String data_modificacao = formatarData(LocalDateTime.now());
 
-  public ProdutoDTO(String nome, String descricao, Double valor, Status status) {
+  public ProdutoDTO(Long id, String nome, String descricao, Double valor, Status status) {
+    this.id = id;
     this.nome = nome;
     this.descricao = descricao;
     this.valor = valor;
