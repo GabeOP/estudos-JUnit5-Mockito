@@ -18,8 +18,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class ProdutoServiceTest {
@@ -28,6 +28,7 @@ class ProdutoServiceTest {
   public static final String DESCRICAO = "PC Gamer Mancer, Ryzen 7 5700G, 16GB DDR4, SSD 240GB, HD 1TB, Fonte 500W 80 Plus";
   public static final double VALOR = 3142.90;
   public static final Status STATUS = Status.DISPONIVEL;
+  public static final long ID = 1L;
   @InjectMocks
   ProdutoService service;
 
@@ -110,14 +111,32 @@ class ProdutoServiceTest {
     }
 
   }
+  @Test
+  void whenExcluirThenDeleteSuccessfuly() {
+    when(repository.findById(any())).thenReturn(Optional.of(produto));
+    doNothing().when(repository).deleteById(anyLong());
+
+    service.excluir(produto.getId());
+
+    verify(repository, times(1)).deleteById(anyLong());
+  }
 
   @Test
-  void excluir() {
+  void whenExcluirThenThrowProdutoNaoEncontradoException() {
+    when(repository.findById(anyLong())).thenThrow(new ProdutoNaoEncontradoException("Produto não encontrado"));
+
+    try {
+      service.excluir(ID);
+    }catch(Exception ex) {
+      assertEquals(ProdutoNaoEncontradoException.class, ex.getClass());
+      assertEquals("Produto não encontrado", ex.getMessage());
+    }
+
   }
 
   private void startProduto() {
-    produto = new Produto(1L, NOME, DESCRICAO, VALOR, STATUS);
-    produtoDTO = new ProdutoDTO(1L, NOME, DESCRICAO, VALOR, STATUS);
+    produto = new Produto(ID, NOME, DESCRICAO, VALOR, STATUS);
+    produtoDTO = new ProdutoDTO(ID, NOME, DESCRICAO, VALOR, STATUS);
 
     repository.save(produto);
   }
