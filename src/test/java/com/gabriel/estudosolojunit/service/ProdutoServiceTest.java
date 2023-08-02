@@ -4,6 +4,7 @@ import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
 import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
+import com.gabriel.estudosolojunit.model.exceptions.ProdutoNaoEncontradoException;
 import com.gabriel.estudosolojunit.repository.ProdutoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,10 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -21,8 +25,8 @@ import static org.mockito.Mockito.when;
 class ProdutoServiceTest {
 
   public static final String NOME = "Computador";
-  public static final String DESCRICAO = "Lorem Ipsum";
-  public static final double VALOR = 1999.90;
+  public static final String DESCRICAO = "PC Gamer Mancer, Ryzen 7 5700G, 16GB DDR4, SSD 240GB, HD 1TB, Fonte 500W 80 Plus";
+  public static final double VALOR = 3142.90;
   public static final Status STATUS = Status.DISPONIVEL;
   @InjectMocks
   ProdutoService service;
@@ -78,7 +82,33 @@ class ProdutoServiceTest {
 
   }
   @Test
-  void editar() {
+  void whenEditarThenModificaProduto() {
+    when(repository.findById(any())).thenReturn(Optional.of(produto));
+    when(repository.save(any())).thenReturn(produto);
+
+    Produto response = service.editar(produtoDTO);
+
+    assertNotNull(response);
+    assertEquals(Produto.class, response.getClass());
+
+    assertEquals(produtoDTO.getId(), response.getId());
+    assertEquals(produtoDTO.getNome(), response.getNome());
+    assertEquals(produtoDTO.getDescricao(), response.getDescricao());
+    assertEquals(produtoDTO.getStatus(), response.getStatus());
+  }
+
+  @Test
+  void whenEditarThenThrowProdutoNaoEncontradoException() {
+    when(repository.save(any())).thenThrow(new ProdutoNaoEncontradoException("Produto não encontrado"));
+
+    try{
+      service.editar(produtoDTO);
+    }catch(Exception ex) {
+
+      assertEquals(ProdutoNaoEncontradoException.class, ex.getClass());
+      assertEquals("Produto não encontrado", ex.getMessage());
+    }
+
   }
 
   @Test
@@ -86,7 +116,9 @@ class ProdutoServiceTest {
   }
 
   private void startProduto() {
-    produto = new Produto(NOME, DESCRICAO, VALOR, STATUS);
-    produtoDTO = new ProdutoDTO(NOME, DESCRICAO, VALOR, STATUS);
+    produto = new Produto(1L, NOME, DESCRICAO, VALOR, STATUS);
+    produtoDTO = new ProdutoDTO(1L, NOME, DESCRICAO, VALOR, STATUS);
+
+    repository.save(produto);
   }
 }
