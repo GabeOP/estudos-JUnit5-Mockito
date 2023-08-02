@@ -1,6 +1,7 @@
 package com.gabriel.estudosolojunit.controller;
 
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
+import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.service.ProdutoService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -41,8 +42,9 @@ public class ProdutoController {
 
   @PutMapping("/{id}")
   public ResponseEntity<ProdutoDTO> editar(@Valid @PathVariable Long id, @RequestBody ProdutoDTO produto) {
-    ProdutoDTO dto = service.editar(id, produto);
-    return ResponseEntity.status(HttpStatus.OK).body(dto);
+    produto.setId(id);
+    Produto dto = service.editar(produto);
+    return ResponseEntity.status(HttpStatus.OK).body(mapper.map(dto, ProdutoDTO.class));
   }
 
   @DeleteMapping("/{id}")

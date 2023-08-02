@@ -30,9 +30,8 @@ public class ProdutoService {
   }
 
   public ProdutoDTO listarPorId(Long id) {
-    Produto entity = repository.findById(id).orElseThrow(() -> {
-      throw new ProdutoNaoEncontradoException("Produto não encontrado");
-    });
+    Produto entity = repository.findById(id)
+            .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
     return mapper.map(entity, ProdutoDTO.class);
   }
 
@@ -48,27 +47,15 @@ public class ProdutoService {
   }
 
 
-  public ProdutoDTO editar(Long id, ProdutoDTO dto) {
+  public Produto editar(ProdutoDTO obj) {
+    repository.findById(obj.getId())
+            .orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
 
-    Produto produto = repository.findById(id).orElseThrow(() -> {
-      throw new ProdutoNaoEncontradoException("Produto não encontrado");
-    });
-
-    produto.setNome(dto.getNome());
-    produto.setDescricao(dto.getDescricao());
-    produto.setValor(dto.getValor());
-    produto.setStatus(dto.getStatus());
-    produto.setData_modificacao(dto.getData_modificacao());
-
-    repository.save(produto);
-    return mapper.map(produto, ProdutoDTO.class);
-
+    return repository.save(mapper.map(obj, Produto.class));
   }
 
   public void excluir(Long id) {
-    repository.findById(id).orElseThrow(() -> {
-      throw new ProdutoNaoEncontradoException("Produto não encontrado");
-    });
+
 
     repository.deleteById(id);
   }
