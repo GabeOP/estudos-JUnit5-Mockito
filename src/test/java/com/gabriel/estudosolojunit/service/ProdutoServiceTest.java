@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +50,18 @@ class ProdutoServiceTest {
 
   @Test
   void listarTodos() {
+    when(repository.findAll()).thenReturn(List.of(produto));
+    when(mapper.map(any(), any())).thenReturn(produtoDTO);
+
+    List<ProdutoDTO> response = service.listarTodos();
+
+    assertEquals(response.size(), 1);
+
+    assertEquals(response.get(0).getClass(), ProdutoDTO.class);
+    assertEquals(response.get(0).getId(), ID);
+    assertEquals(response.get(0).getNome(), NOME);
+    assertEquals(response.get(0).getDescricao(), DESCRICAO);
+    assertEquals(response.get(0).getValor(), VALOR);
   }
 
   @Test
