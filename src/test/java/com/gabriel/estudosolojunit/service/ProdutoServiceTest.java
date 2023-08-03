@@ -52,8 +52,34 @@ class ProdutoServiceTest {
   }
 
   @Test
-  void listarPorId() {
+  void whenListarPorIdThenReturnProdutoDTO() {
+    when(repository.findById(any())).thenReturn(Optional.of(produto));
+    when(mapper.map(any(), any())).thenReturn(produtoDTO);
+
+    ProdutoDTO response = service.listarPorId(anyLong());
+
+    assertNotNull(response);
+    assertEquals(response.getClass(), ProdutoDTO.class);
+    assertEquals(response.getId(), ID);
+    assertEquals(response.getNome(), NOME);
+    assertEquals(response.getValor(), VALOR);
+    assertEquals(response.getDescricao(), DESCRICAO);
+    assertEquals(response.getStatus(), STATUS);
   }
+
+  @Test
+  void whenListarPorIdThenThrowProdutoNaoEncontradoException() {
+    when(repository.findById(any())).thenThrow(new ProdutoNaoEncontradoException("Produto não encontrado"));
+
+    try{
+      service.listarPorId(ID);
+    }catch(Exception ex) {
+      assertEquals(ProdutoNaoEncontradoException.class, ex.getClass());
+      assertEquals("Produto não encontrado", ex.getMessage());
+    }
+
+  }
+
 
   @Test
   void whenAdicionarThenAddUser() {
