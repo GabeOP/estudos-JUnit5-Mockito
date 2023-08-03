@@ -30,8 +30,8 @@ public class ProdutoService {
   }
 
   public ProdutoDTO listarPorId(Long id) {
-
-    return mapper.map(id, ProdutoDTO.class);
+    verificaSeProdutoExiste(id);
+    return mapper.map(repository.findById(id), ProdutoDTO.class);
   }
 
   public ProdutoDTO adicionar(ProdutoDTO dto) {
