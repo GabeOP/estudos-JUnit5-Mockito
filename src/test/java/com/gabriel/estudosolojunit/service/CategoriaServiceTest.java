@@ -2,6 +2,7 @@ package com.gabriel.estudosolojunit.service;
 
 import com.gabriel.estudosolojunit.model.dto.CategoriaDTO;
 import com.gabriel.estudosolojunit.model.entities.Categoria;
+import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.repository.CategoriaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,9 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +50,25 @@ class CategoriaServiceTest {
     assertEquals(response.size(), 1);
     assertEquals(response.get(0).getId(), ID);
     assertEquals(response.get(0).getNome(), NOME);
+  }
+
+  @Test
+  void whenListarPorIdThenReturnCategoriaDTO() {
+    when(repository.findById(any())).thenReturn(Optional.of(categoria));
+    when(mapper.map(any(),any())).thenReturn(categoriaDTO);
+
+    CategoriaDTO response = service.listarPorId(ID);
+
+    assertNotNull(response);
+  }
+
+  @Test
+  void whenListarPorIdThenThrowNaoEncontradoException() {
+    when(repository.findById(any())).thenThrow(new NaoEncontradoException("Não encontrado. ID inválido."));
+
+    assertThrows(NaoEncontradoException.class, () -> {
+      service.listarPorId(ID);
+    });
   }
 
   private void iniciaCategoria() {
