@@ -1,7 +1,7 @@
 package com.gabriel.estudosolojunit.service.exception;
 
 import com.gabriel.estudosolojunit.model.StandardError;
-import com.gabriel.estudosolojunit.model.exceptions.ProdutoNaoEncontradoException;
+import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -29,7 +29,7 @@ class ServiceExceptionHandlerTest {
   void produtoNaoEncontradoException() {
     ResponseEntity<StandardError> response = handler
             .produtoNaoEncontrado
-            (new ProdutoNaoEncontradoException("Produto não encontrado"), new MockHttpServletRequest());
+            (new NaoEncontradoException("Produto não encontrado"), new MockHttpServletRequest());
 
     assertNotNull(response);
     assertNotNull(response.getBody());

@@ -2,7 +2,7 @@ package com.gabriel.estudosolojunit.service.exception;
 
 import com.gabriel.estudosolojunit.model.StandardError;
 import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
-import com.gabriel.estudosolojunit.model.exceptions.ProdutoNaoEncontradoException;
+import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ServiceExceptionHandler {
 
-  @ExceptionHandler(ProdutoNaoEncontradoException.class)
-  public ResponseEntity<StandardError> produtoNaoEncontrado(ProdutoNaoEncontradoException ex, HttpServletRequest request) {
+  @ExceptionHandler(NaoEncontradoException.class)
+  public ResponseEntity<StandardError> produtoNaoEncontrado(NaoEncontradoException ex, HttpServletRequest request) {
     StandardError error = new StandardError(LocalDateTime.now(),
             HttpStatus.NOT_FOUND.value(),
             ex.getMessage(),

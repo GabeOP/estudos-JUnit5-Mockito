@@ -3,7 +3,7 @@ package com.gabriel.estudosolojunit.service;
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
-import com.gabriel.estudosolojunit.model.exceptions.ProdutoNaoEncontradoException;
+import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.repository.ProdutoRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +58,6 @@ public class ProdutoService {
   }
 
   private void verificaSeProdutoExiste(Long id) {
-    repository.findById(id).orElseThrow(() -> new ProdutoNaoEncontradoException("Produto não encontrado"));
+    repository.findById(id).orElseThrow(() -> new NaoEncontradoException("Produto não encontrado"));
   }
 }

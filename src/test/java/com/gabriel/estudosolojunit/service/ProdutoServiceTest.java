@@ -4,7 +4,7 @@ import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
 import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
-import com.gabriel.estudosolojunit.model.exceptions.ProdutoNaoEncontradoException;
+import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.repository.ProdutoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,12 +82,12 @@ class ProdutoServiceTest {
 
   @Test
   void whenListarPorIdThenThrowProdutoNaoEncontradoException() {
-    when(repository.findById(any())).thenThrow(new ProdutoNaoEncontradoException("Produto não encontrado"));
+    when(repository.findById(any())).thenThrow(new NaoEncontradoException("Produto não encontrado"));
 
     try{
       service.listarPorId(ID);
     }catch(Exception ex) {
-      assertEquals(ProdutoNaoEncontradoException.class, ex.getClass());
+      assertEquals(NaoEncontradoException.class, ex.getClass());
       assertEquals("Produto não encontrado", ex.getMessage());
     }
 
@@ -139,13 +139,13 @@ class ProdutoServiceTest {
 
   @Test
   void whenEditarThenThrowProdutoNaoEncontradoException() {
-    when(repository.save(any())).thenThrow(new ProdutoNaoEncontradoException("Produto não encontrado"));
+    when(repository.save(any())).thenThrow(new NaoEncontradoException("Produto não encontrado"));
 
     try{
       service.editar(produtoDTO);
     }catch(Exception ex) {
 
-      assertEquals(ProdutoNaoEncontradoException.class, ex.getClass());
+      assertEquals(NaoEncontradoException.class, ex.getClass());
       assertEquals("Produto não encontrado", ex.getMessage());
     }
 
@@ -162,12 +162,12 @@ class ProdutoServiceTest {
 
   @Test
   void whenExcluirThenThrowProdutoNaoEncontradoException() {
-    when(repository.findById(anyLong())).thenThrow(new ProdutoNaoEncontradoException("Produto não encontrado"));
+    when(repository.findById(anyLong())).thenThrow(new NaoEncontradoException("Produto não encontrado"));
 
     try {
       service.excluir(ID);
     }catch(Exception ex) {
-      assertEquals(ProdutoNaoEncontradoException.class, ex.getClass());
+      assertEquals(NaoEncontradoException.class, ex.getClass());
       assertEquals("Produto não encontrado", ex.getMessage());
     }
 
