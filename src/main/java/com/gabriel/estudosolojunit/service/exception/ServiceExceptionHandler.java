@@ -1,7 +1,7 @@
 package com.gabriel.estudosolojunit.service.exception;
 
 import com.gabriel.estudosolojunit.model.StandardError;
-import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
+import com.gabriel.estudosolojunit.model.exceptions.JaCadastradoException;
 import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -35,8 +35,8 @@ public class ServiceExceptionHandler {
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
   }
 
-  @ExceptionHandler(ProdutoJaCadastradoException.class)
-  public ResponseEntity<StandardError> jaCadastrado(ProdutoJaCadastradoException ex, HttpServletRequest request) {
+  @ExceptionHandler(JaCadastradoException.class)
+  public ResponseEntity<StandardError> jaCadastrado(JaCadastradoException ex, HttpServletRequest request) {
     StandardError error = new StandardError(LocalDateTime.now(),
             HttpStatus.UNPROCESSABLE_ENTITY.value(),
             ex.getMessage(),

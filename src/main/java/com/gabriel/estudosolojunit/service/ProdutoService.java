@@ -2,7 +2,7 @@ package com.gabriel.estudosolojunit.service;
 
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
-import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
+import com.gabriel.estudosolojunit.model.exceptions.JaCadastradoException;
 import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.repository.ProdutoRepository;
 import org.modelmapper.ModelMapper;
@@ -37,7 +37,7 @@ public class ProdutoService {
   public ProdutoDTO adicionar(ProdutoDTO dto) {
     Optional<Produto> optional = repository.findByNome(dto.getNome());
     if(optional.isPresent()) {
-      throw new ProdutoJaCadastradoException("Produto já cadastrado");
+      throw new JaCadastradoException("Produto já cadastrado");
     }
 
     Produto produto = mapper.map(dto, Produto.class);

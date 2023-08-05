@@ -3,7 +3,7 @@ package com.gabriel.estudosolojunit.service;
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
-import com.gabriel.estudosolojunit.model.exceptions.ProdutoJaCadastradoException;
+import com.gabriel.estudosolojunit.model.exceptions.JaCadastradoException;
 import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.repository.ProdutoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,12 +111,12 @@ class ProdutoServiceTest {
 
   @Test
   void whenAdicionarThenThrowProdutoJaCadastradoException() {
-    when(repository.save(any())).thenThrow(new ProdutoJaCadastradoException("Produto já cadastrado"));
+    when(repository.save(any())).thenThrow(new JaCadastradoException("Produto já cadastrado"));
 
     try{
       service.adicionar(produtoDTO);
     }catch(Exception ex) {
-      assertEquals(ProdutoJaCadastradoException.class, ex.getClass());
+      assertEquals(JaCadastradoException.class, ex.getClass());
       assertEquals("Produto já cadastrado", ex.getMessage());
     }
 

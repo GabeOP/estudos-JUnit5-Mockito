@@ -2,6 +2,7 @@ package com.gabriel.estudosolojunit.service;
 
 import com.gabriel.estudosolojunit.model.dto.CategoriaDTO;
 import com.gabriel.estudosolojunit.model.entities.Categoria;
+import com.gabriel.estudosolojunit.model.exceptions.JaCadastradoException;
 import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.repository.CategoriaRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,10 +65,30 @@ class CategoriaServiceTest {
 
   @Test
   void whenListarPorIdThenThrowNaoEncontradoException() {
-    when(repository.findById(any())).thenThrow(new NaoEncontradoException("Não encontrado. ID inválido."));
+    when(repository.findById(any())).thenReturn(Optional.empty());
 
     assertThrows(NaoEncontradoException.class, () -> {
       service.listarPorId(ID);
+    });
+  }
+
+  @Test
+  void whenAdicionarThenCriaUmaNovaCategoria() {
+    when(repository.findById(any())).thenReturn(Optional.empty());
+    when(mapper.map(categoriaDTO, Categoria.class)).thenReturn(categoria);
+
+    CategoriaDTO response = service.adicionar(categoriaDTO);
+
+    assertNotNull(response);
+    assertEquals(response.getClass(), CategoriaDTO.class);
+  }
+
+  @Test
+  void whenAdicionarThenThrowJaCadastradoException() {
+    when(repository.findById(any())).thenReturn(Optional.of(categoria));
+
+    assertThrows(JaCadastradoException.class, () -> {
+      service.adicionar(categoriaDTO);
     });
   }
 
