@@ -17,7 +17,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 class CategoriaServiceTest {
 
@@ -89,6 +91,46 @@ class CategoriaServiceTest {
 
     assertThrows(JaCadastradoException.class, () -> {
       service.adicionar(categoriaDTO);
+    });
+  }
+
+  @Test
+  void whenEditarThenEditaCategoria() {
+    when(repository.findById(any())).thenReturn(Optional.of(categoria));
+    when(repository.save(any())).thenReturn(categoria);
+
+    CategoriaDTO response = service.editar(categoriaDTO);
+
+    assertNotNull(response);
+    assertEquals(response.getClass(), CategoriaDTO.class);
+    assertEquals(response.getNome(), categoriaDTO.getNome());
+  }
+
+  @Test
+  void whenEditarThenThrowNaoEncontradoException() {
+    when(repository.findById(any())).thenReturn(Optional.empty());
+
+    assertThrows(NaoEncontradoException.class, () -> {
+      service.editar(categoriaDTO);
+    });
+  }
+
+  @Test
+  void whenDeleteThenExcluiCategoria() {
+    when(repository.findById(any())).thenReturn(Optional.of(categoria));
+    doNothing().when(repository).deleteById(any());
+
+    service.excluir(categoriaDTO.getId());
+
+    verify(repository, times(1)).deleteById(anyLong());
+  }
+
+  @Test
+  void whenDeleteThenThrowNaoEncontradoException() {
+    when(repository.findById(any())).thenReturn(Optional.empty());
+
+    assertThrows(NaoEncontradoException.class, () -> {
+      service.excluir(ID);
     });
   }
 
