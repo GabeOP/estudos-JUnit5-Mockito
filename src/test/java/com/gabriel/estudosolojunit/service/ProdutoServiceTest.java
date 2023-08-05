@@ -17,9 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -82,14 +82,11 @@ class ProdutoServiceTest {
 
   @Test
   void whenListarPorIdThenThrowProdutoNaoEncontradoException() {
-    when(repository.findById(any())).thenThrow(new NaoEncontradoException("Produto não encontrado"));
+    when(repository.findById(any())).thenReturn(Optional.empty());
 
-    try{
+    assertThrows(NaoEncontradoException.class, () -> {
       service.listarPorId(ID);
-    }catch(Exception ex) {
-      assertEquals(NaoEncontradoException.class, ex.getClass());
-      assertEquals("Produto não encontrado", ex.getMessage());
-    }
+    });
 
   }
 
@@ -111,14 +108,11 @@ class ProdutoServiceTest {
 
   @Test
   void whenAdicionarThenThrowProdutoJaCadastradoException() {
-    when(repository.save(any())).thenThrow(new JaCadastradoException("Produto já cadastrado"));
+    when(repository.findByNome(any())).thenReturn(Optional.of(produto));
 
-    try{
+    assertThrows(JaCadastradoException.class, () -> {
       service.adicionar(produtoDTO);
-    }catch(Exception ex) {
-      assertEquals(JaCadastradoException.class, ex.getClass());
-      assertEquals("Produto já cadastrado", ex.getMessage());
-    }
+    });
 
   }
   @Test
@@ -139,15 +133,11 @@ class ProdutoServiceTest {
 
   @Test
   void whenEditarThenThrowProdutoNaoEncontradoException() {
-    when(repository.save(any())).thenThrow(new NaoEncontradoException("Produto não encontrado"));
+    when(repository.findById(any())).thenReturn(Optional.empty());
 
-    try{
+    assertThrows(NaoEncontradoException.class, () -> {
       service.editar(produtoDTO);
-    }catch(Exception ex) {
-
-      assertEquals(NaoEncontradoException.class, ex.getClass());
-      assertEquals("Produto não encontrado", ex.getMessage());
-    }
+    });
 
   }
   @Test
@@ -162,14 +152,11 @@ class ProdutoServiceTest {
 
   @Test
   void whenExcluirThenThrowProdutoNaoEncontradoException() {
-    when(repository.findById(anyLong())).thenThrow(new NaoEncontradoException("Produto não encontrado"));
+    when(repository.findById(anyLong())).thenReturn(Optional.empty());
 
-    try {
+    assertThrows(NaoEncontradoException.class, () -> {
       service.excluir(ID);
-    }catch(Exception ex) {
-      assertEquals(NaoEncontradoException.class, ex.getClass());
-      assertEquals("Produto não encontrado", ex.getMessage());
-    }
+    });
 
   }
 
