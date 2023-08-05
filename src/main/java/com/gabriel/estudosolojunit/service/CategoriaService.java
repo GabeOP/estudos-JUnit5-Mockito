@@ -44,4 +44,19 @@ public class CategoriaService {
     return dto;
   }
 
+  public CategoriaDTO editar(CategoriaDTO dto) {
+    Categoria entity = repository.findById(dto.getId())
+            .orElseThrow(() -> new NaoEncontradoException("Categoria não encontrada"));
+
+    repository.save(mapper.map(dto, Categoria.class));
+
+    return dto;
+  }
+
+  public void excluir(Long id) {
+    Categoria entity = repository.findById(id)
+            .orElseThrow(() -> new NaoEncontradoException(("Categoria não encontrada")));
+
+    repository.deleteById(entity.getId());
+  }
 }
