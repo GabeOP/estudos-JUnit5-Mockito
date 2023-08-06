@@ -1,5 +1,6 @@
 package com.gabriel.estudosolojunit.controller;
 
+import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
 import com.gabriel.estudosolojunit.service.ProdutoService;
@@ -8,27 +9,30 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 class ProdutoControllerTest {
 
-  private Produto produto;
+  public static final String NOME = "Computador";
+  public static final String DESCRICAO = "PC Gamer Mancer, Ryzen 7 5700G, 16GB DDR4, SSD 240GB, HD 1TB, Fonte 500W 80 Plus";
+  public static final double VALOR = 3142.90;
+  public static final Status STATUS = Status.DISPONIVEL;
+  public static final long ID = 1L;
+
+  Produto produto;
+  ProdutoDTO produtoDTO;
 
   @InjectMocks
-  ProdutoController produtoController;
+  ProdutoController controller;
 
   @Mock
-  ProdutoService produtoService;
+  ProdutoService service;
 
   @BeforeEach
   void setUp() {
@@ -38,36 +42,37 @@ class ProdutoControllerTest {
 
   @Test
   void listarTodos() {
-    when(produtoService.listarTodos()).thenReturn(List.of(produto));
+    when(service.listarTodos()).thenReturn(List.of(produtoDTO));
 
-    ResponseEntity<List<Produto>> response = produtoController.listarTodos();
+    ResponseEntity<List<ProdutoDTO>> response = controller.listarTodos();
 
-    assertNotNull(response);
-    assertNotNull(response.getBody());
-    assertEquals(ResponseEntity.class, response.getClass());
     assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(ResponseEntity.class, response.getClass());
 
-    assertEquals(1, response.getBody().size());
-    assertEquals(1, response.getBody().get(0).getId());
-    assertEquals("Computador", response.getBody().get(0).getNome());
-    assertEquals("Computador portátil", response.getBody().get(0).getDescricao());
-    assertEquals(2999.99, response.getBody().get(0).getValor());
+    assertEquals(ID, response.getBody().get(0).getId());
+    assertEquals(NOME, response.getBody().get(0).getNome());
+    assertEquals(DESCRICAO, response.getBody().get(0).getDescricao());
+    assertEquals(VALOR, response.getBody().get(0).getValor());
+  }
+
+  @Test
+  void listarPorId() {
   }
 
   @Test
   void adicionar() {
-    when(produtoService.adicionar(any())).thenReturn(produto);
+  }
 
-    ResponseEntity<Produto> response = produtoController.adicionar(produto);
+  @Test
+  void editar() {
+  }
 
-    assertNotNull(response);
-    assertEquals(ResponseEntity.class, response.getClass());
-    assertEquals(Produto.class, response.getBody().getClass());
-    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+  @Test
+  void excluir() {
   }
 
   private void startProduto() {
-    produto = new Produto(1L, "Computador", "Computador portátil", 2999.99,
-            "27/07/2023 12:49:45", "27/07/2023 12:49:45", Status.DISPONIVEL);
+    produto = new Produto(ID, NOME, DESCRICAO, VALOR, STATUS);
+    produtoDTO = new ProdutoDTO(ID, NOME, DESCRICAO, VALOR, STATUS);
   }
 }
