@@ -1,5 +1,6 @@
 package com.gabriel.estudosolojunit.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
@@ -7,16 +8,25 @@ import com.gabriel.estudosolojunit.service.ProdutoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+
+@SpringBootTest
+@AutoConfigureMockMvc
 class ProdutoControllerTest {
 
   public static final String NOME = "Computador";
@@ -31,8 +41,14 @@ class ProdutoControllerTest {
   @InjectMocks
   ProdutoController controller;
 
-  @Mock
+  @MockBean
   ProdutoService service;
+
+  @Autowired
+  MockMvc mockMvc;
+
+  @Autowired
+  ObjectMapper objectMapper;
 
   @BeforeEach
   void setUp() {
@@ -41,18 +57,15 @@ class ProdutoControllerTest {
   }
 
   @Test
-  void listarTodos() {
+  void whenListarTodosThenReturn200Status() throws Exception{
     when(service.listarTodos()).thenReturn(List.of(produtoDTO));
 
-    ResponseEntity<List<ProdutoDTO>> response = controller.listarTodos();
-
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals(ResponseEntity.class, response.getClass());
-
-    assertEquals(ID, response.getBody().get(0).getId());
-    assertEquals(NOME, response.getBody().get(0).getNome());
-    assertEquals(DESCRICAO, response.getBody().get(0).getDescricao());
-    assertEquals(VALOR, response.getBody().get(0).getValor());
+    mockMvc.perform(MockMvcRequestBuilders.get("/produto"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].nome").value(NOME))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].descricao").value(DESCRICAO))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].valor").value(VALOR))
+            .andDo(MockMvcResultHandlers.print());
   }
 
   @Test
@@ -60,7 +73,18 @@ class ProdutoControllerTest {
   }
 
   @Test
-  void adicionar() {
+  void whenAdicionarThenReturn201Status() throws Exception {
+    when(service.adicionar(any())).thenReturn(produtoDTO);
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/produto")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(produtoDTO))
+            )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value(NOME))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value(DESCRICAO))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.valor").value(VALOR))
+            .andDo(MockMvcResultHandlers.print());
   }
 
   @Test
