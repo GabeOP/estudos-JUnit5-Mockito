@@ -124,6 +124,20 @@ class ProdutoControllerTest {
   }
 
   @Test
+  void whenEditarThenReturn404Status() throws Exception {
+    when(service.editar(any())).thenThrow(new NaoEncontradoException("Produto não encontrado"));
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/produto/{ID}", ID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(produtoDTO))
+    )
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Produto não encontrado"))
+            .andDo(MockMvcResultHandlers.print());
+
+  }
+
+  @Test
   void excluir() {
   }
 
