@@ -138,7 +138,11 @@ class ProdutoControllerTest {
   }
 
   @Test
-  void excluir() {
+  void whenExcluirThenReturn204Status() throws Exception{
+
+    mockMvc.perform(MockMvcRequestBuilders.delete("/produto/{ID}", ID))
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(MockMvcResultHandlers.print());
   }
 
   private void startProduto() {
