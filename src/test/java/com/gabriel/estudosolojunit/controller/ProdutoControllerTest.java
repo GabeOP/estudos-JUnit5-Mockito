@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
+import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.service.ProdutoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ class ProdutoControllerTest {
   public static final double VALOR = 3142.90;
   public static final Status STATUS = Status.DISPONIVEL;
   public static final long ID = 1L;
+  public static final Long ID_INEXISTENTE = 2L;
 
   Produto produto;
   ProdutoDTO produtoDTO;
@@ -69,7 +71,14 @@ class ProdutoControllerTest {
   }
 
   @Test
-  void listarPorId() {
+  void whenListarPorIdThenReturn404Status() throws Exception {
+    when(service.listarPorId(ID_INEXISTENTE)).thenThrow(new NaoEncontradoException("Produto não encontrado"));
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/produto/{idInexistente}", ID_INEXISTENTE)
+            .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
   }
 
   @Test
