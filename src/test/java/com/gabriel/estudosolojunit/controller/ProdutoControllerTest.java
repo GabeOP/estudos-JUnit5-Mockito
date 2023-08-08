@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 
@@ -72,6 +73,21 @@ class ProdutoControllerTest {
   }
 
   @Test
+  void whenListarPorIdThenReturn200Status() throws Exception{
+    when(service.listarPorId(any())).thenReturn(produtoDTO);
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/produto/{ID}", ID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(produtoDTO))
+    )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value(NOME))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value(DESCRICAO))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.valor").value(VALOR))
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
   void whenListarPorIdThenReturn404Status() throws Exception {
     when(service.listarPorId(ID_INEXISTENTE)).thenThrow(new NaoEncontradoException("Produto não encontrado"));
 
@@ -111,11 +127,47 @@ class ProdutoControllerTest {
   }
 
   @Test
-  void editar() {
+  void whenEditarThenReturn200Status() throws Exception {
+    when(service.editar(any())).thenReturn(produto);
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/produto/{ID}", ID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(produtoDTO))
+    )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(MockMvcResultHandlers.print());
+
   }
 
   @Test
-  void excluir() {
+  void whenEditarThenReturn404Status() throws Exception {
+    when(service.editar(any())).thenThrow(new NaoEncontradoException("Produto não encontrado"));
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/produto/{ID}", ID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(produtoDTO))
+    )
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Produto não encontrado"))
+            .andDo(MockMvcResultHandlers.print());
+
+  }
+
+  @Test
+  void whenExcluirThenReturn204Status() throws Exception{
+
+    mockMvc.perform(MockMvcRequestBuilders.delete("/produto/{ID}", ID))
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenExcluirThenReturn404Status() throws Exception {
+    doThrow(NaoEncontradoException.class).when(service).excluir(ID_INEXISTENTE);
+
+    mockMvc.perform(MockMvcRequestBuilders.delete("/produto/{IdInexistente}", ID_INEXISTENTE))
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
   }
 
   private void startProduto() {
