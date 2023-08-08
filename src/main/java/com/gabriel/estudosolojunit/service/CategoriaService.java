@@ -45,7 +45,7 @@ public class CategoriaService {
   }
 
   public CategoriaDTO editar(CategoriaDTO dto) {
-    Categoria entity = repository.findByNome(dto.getNome())
+    Categoria entity = repository.findById(dto.getId())
             .orElseThrow(() -> new NaoEncontradoException("Categoria não encontrada"));
 
     repository.save(mapper.map(dto, Categoria.class));

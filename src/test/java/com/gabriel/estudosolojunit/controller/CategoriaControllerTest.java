@@ -103,6 +103,32 @@ class CategoriaControllerTest {
             .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
             .andDo(MockMvcResultHandlers.print());
   }
+
+  @Test
+  void whenEditarThenReturn200Status() throws Exception {
+    when(service.editar(any())).thenReturn(categoriaDTO);
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/categoria/{ID}", ID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(categoriaDTO))
+    )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value(NOME))
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenEditarThenReturn404Status() throws Exception {
+    when(service.editar(any())).thenThrow(new NaoEncontradoException("Categoria não encontrada"));
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/categoria/{ID_INEXISTENTE}", ID_INEXISTENTE)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(categoriaDTO))
+    )
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
+  }
+
   private void iniciaCategoria() {
     categoria = new Categoria(ID, NOME);
     categoriaDTO = new CategoriaDTO(ID, NOME);

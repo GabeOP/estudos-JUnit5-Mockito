@@ -35,4 +35,11 @@ public class CategoriaController {
     return ResponseEntity.status(HttpStatus.CREATED).body(dto);
   }
 
+  @PutMapping("/{id}")
+  public ResponseEntity<CategoriaDTO> editar(@Valid @PathVariable Long id, @RequestBody CategoriaDTO obj) {
+    obj.setId(id);
+    CategoriaDTO dto = service.editar(obj);
+    return ResponseEntity.status(HttpStatus.OK).body(dto);
+  }
+
 }
