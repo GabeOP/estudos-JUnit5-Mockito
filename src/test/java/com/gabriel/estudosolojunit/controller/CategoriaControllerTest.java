@@ -3,6 +3,7 @@ package com.gabriel.estudosolojunit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabriel.estudosolojunit.model.dto.CategoriaDTO;
 import com.gabriel.estudosolojunit.model.entities.Categoria;
+import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.service.CategoriaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ class CategoriaControllerTest {
 
   public static final long ID = 1L;
   public static final String NOME = "Eletrônico";
+  public static final long ID_INEXISTENTE = 2L;
   @InjectMocks
   CategoriaController controller;
 
@@ -52,6 +54,25 @@ class CategoriaControllerTest {
     when(service.listarTodos()).thenReturn(List.of(categoriaDTO));
     mockMvc.perform(MockMvcRequestBuilders.get("/categoria"))
             .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenListarPorIdThenReturn200Status() throws Exception {
+    when(service.listarPorId(ID)).thenReturn(categoriaDTO);
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/categoria/{ID}", ID))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value(NOME))
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenListarPorIdReturn404Status() throws Exception {
+    when(service.listarPorId(ID_INEXISTENTE)).thenThrow(new NaoEncontradoException("Categoria não encontrada"));
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/categoria/{ID_INEXISTENTE}", ID_INEXISTENTE))
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
             .andDo(MockMvcResultHandlers.print());
   }
 
