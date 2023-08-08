@@ -111,7 +111,16 @@ class ProdutoControllerTest {
   }
 
   @Test
-  void editar() {
+  void whenEditarThenReturn200Status() throws Exception {
+    when(service.editar(any())).thenReturn(produto);
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/produto/{ID}", ID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(produtoDTO))
+    )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andDo(MockMvcResultHandlers.print());
+
   }
 
   @Test
