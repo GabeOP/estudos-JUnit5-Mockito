@@ -73,6 +73,21 @@ class ProdutoControllerTest {
   }
 
   @Test
+  void whenListarPorIdThenReturn200Status() throws Exception{
+    when(service.listarPorId(any())).thenReturn(produtoDTO);
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/produto/{ID}", ID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(produtoDTO))
+    )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value(NOME))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value(DESCRICAO))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.valor").value(VALOR))
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
   void whenListarPorIdThenReturn404Status() throws Exception {
     when(service.listarPorId(ID_INEXISTENTE)).thenThrow(new NaoEncontradoException("Produto não encontrado"));
 
