@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -125,6 +126,22 @@ class CategoriaControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(categoriaDTO))
     )
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenExcluirThenReturn204Status() throws Exception {
+    mockMvc.perform(MockMvcRequestBuilders.delete("/categoria/{ID}", ID))
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenExcluirThenReturn404Status() throws Exception {
+    doThrow(new NaoEncontradoException("Categoria não encontrada")).when(service).excluir(ID_INEXISTENTE);
+
+    mockMvc.perform(MockMvcRequestBuilders.delete("/categoria/{ID_INEXISTENTE}", ID_INEXISTENTE))
             .andExpect(MockMvcResultMatchers.status().isNotFound())
             .andDo(MockMvcResultHandlers.print());
   }
