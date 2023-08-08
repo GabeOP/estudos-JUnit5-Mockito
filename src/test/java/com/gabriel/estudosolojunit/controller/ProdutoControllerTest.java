@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
+import com.gabriel.estudosolojunit.model.exceptions.JaCadastradoException;
 import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.service.ProdutoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,6 +94,19 @@ class ProdutoControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value(NOME))
             .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value(DESCRICAO))
             .andExpect(MockMvcResultMatchers.jsonPath("$.valor").value(VALOR))
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenAdicionarThenReturn422Status() throws Exception {
+
+    when(service.adicionar(any())).thenThrow(new JaCadastradoException("Produto já cadastrado"));
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/produto")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(produtoDTO))
+            )
+            .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
             .andDo(MockMvcResultHandlers.print());
   }
 
