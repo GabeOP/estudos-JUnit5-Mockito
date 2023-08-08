@@ -33,7 +33,7 @@ public class CategoriaService {
   }
 
   public CategoriaDTO adicionar(CategoriaDTO dto) {
-    Optional<Categoria> optional = repository.findById(dto.getId());
+    Optional<Categoria> optional = repository.findByNome(dto.getNome());
 
     if(optional.isPresent()) {
       throw new JaCadastradoException("Categoria já cadastrada.");
