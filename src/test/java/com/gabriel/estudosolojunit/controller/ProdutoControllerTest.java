@@ -1,34 +1,57 @@
 package com.gabriel.estudosolojunit.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gabriel.estudosolojunit.model.dto.ProdutoDTO;
 import com.gabriel.estudosolojunit.model.entities.Produto;
 import com.gabriel.estudosolojunit.model.enums.Status;
+import com.gabriel.estudosolojunit.model.exceptions.JaCadastradoException;
+import com.gabriel.estudosolojunit.model.exceptions.NaoEncontradoException;
 import com.gabriel.estudosolojunit.service.ProdutoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+
 @SpringBootTest
+@AutoConfigureMockMvc
 class ProdutoControllerTest {
 
-  private Produto produto;
+  public static final String NOME = "Computador";
+  public static final String DESCRICAO = "PC Gamer Mancer, Ryzen 7 5700G, 16GB DDR4, SSD 240GB, HD 1TB, Fonte 500W 80 Plus";
+  public static final double VALOR = 3142.90;
+  public static final Status STATUS = Status.DISPONIVEL;
+  public static final long ID = 1L;
+  public static final Long ID_INEXISTENTE = 2L;
+
+  Produto produto;
+  ProdutoDTO produtoDTO;
 
   @InjectMocks
-  ProdutoController produtoController;
+  ProdutoController controller;
 
-  @Mock
-  ProdutoService produtoService;
+  @MockBean
+  ProdutoService service;
+
+  @Autowired
+  MockMvc mockMvc;
+
+  @Autowired
+  ObjectMapper objectMapper;
 
   @BeforeEach
   void setUp() {
@@ -37,37 +60,66 @@ class ProdutoControllerTest {
   }
 
   @Test
-  void listarTodos() {
-    when(produtoService.listarTodos()).thenReturn(List.of(produto));
+  void whenListarTodosThenReturn200Status() throws Exception{
+    when(service.listarTodos()).thenReturn(List.of(produtoDTO));
 
-    ResponseEntity<List<Produto>> response = produtoController.listarTodos();
-
-    assertNotNull(response);
-    assertNotNull(response.getBody());
-    assertEquals(ResponseEntity.class, response.getClass());
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-
-    assertEquals(1, response.getBody().size());
-    assertEquals(1, response.getBody().get(0).getId());
-    assertEquals("Computador", response.getBody().get(0).getNome());
-    assertEquals("Computador portátil", response.getBody().get(0).getDescricao());
-    assertEquals(2999.99, response.getBody().get(0).getValor());
+    mockMvc.perform(MockMvcRequestBuilders.get("/produto"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].nome").value(NOME))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].descricao").value(DESCRICAO))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].valor").value(VALOR))
+            .andDo(MockMvcResultHandlers.print());
   }
 
   @Test
-  void adicionar() {
-    when(produtoService.adicionar(any())).thenReturn(produto);
+  void whenListarPorIdThenReturn404Status() throws Exception {
+    when(service.listarPorId(ID_INEXISTENTE)).thenThrow(new NaoEncontradoException("Produto não encontrado"));
 
-    ResponseEntity<Produto> response = produtoController.adicionar(produto);
+    mockMvc.perform(MockMvcRequestBuilders.get("/produto/{idInexistente}", ID_INEXISTENTE)
+            .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
+            .andDo(MockMvcResultHandlers.print());
+  }
 
-    assertNotNull(response);
-    assertEquals(ResponseEntity.class, response.getClass());
-    assertEquals(Produto.class, response.getBody().getClass());
-    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+  @Test
+  void whenAdicionarThenReturn201Status() throws Exception {
+    when(service.adicionar(any())).thenReturn(produtoDTO);
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/produto")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(produtoDTO))
+            )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value(NOME))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.descricao").value(DESCRICAO))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.valor").value(VALOR))
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenAdicionarThenReturn422Status() throws Exception {
+
+    when(service.adicionar(any())).thenThrow(new JaCadastradoException("Produto já cadastrado"));
+
+    mockMvc.perform(MockMvcRequestBuilders.post("/produto")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(produtoDTO))
+            )
+            .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void editar() {
+  }
+
+  @Test
+  void excluir() {
   }
 
   private void startProduto() {
-    produto = new Produto(1L, "Computador", "Computador portátil", 2999.99,
-            "27/07/2023 12:49:45", "27/07/2023 12:49:45", Status.DISPONIVEL);
+    produto = new Produto(ID, NOME, DESCRICAO, VALOR, STATUS);
+    produtoDTO = new ProdutoDTO(ID, NOME, DESCRICAO, VALOR, STATUS);
   }
 }
