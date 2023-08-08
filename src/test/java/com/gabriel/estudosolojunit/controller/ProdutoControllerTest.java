@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 
@@ -142,6 +143,15 @@ class ProdutoControllerTest {
 
     mockMvc.perform(MockMvcRequestBuilders.delete("/produto/{ID}", ID))
             .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(MockMvcResultHandlers.print());
+  }
+
+  @Test
+  void whenExcluirThenReturn404Status() throws Exception {
+    doThrow(NaoEncontradoException.class).when(service).excluir(ID_INEXISTENTE);
+
+    mockMvc.perform(MockMvcRequestBuilders.delete("/produto/{IdInexistente}", ID_INEXISTENTE))
+            .andExpect(MockMvcResultMatchers.status().isNotFound())
             .andDo(MockMvcResultHandlers.print());
   }
 
